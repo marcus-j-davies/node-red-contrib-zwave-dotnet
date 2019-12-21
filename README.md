@@ -111,8 +111,7 @@ Example of building a notifcation report.
 All the solutions I have come across for connecting ZWave to node-red, involves various compiling of different libraries, and various configurations to take place. I am a very impatient person, so i decided to build my own solution, with the aim to make it far far easiyer compared to other solutions - not to discredit other solutions - they are awseome, just that, there is a lot more mileage involved to get them running.
 
 # Installing
-If you are running on windows - ensure you have .net 4.5 installed, for Ubunto and alike ensure mono is installed
-(i would go for mono-complete) to ensure all needed .net assemblies are available.
+If you are running on windows - ensure you have .net 4.5 installed, for Ubunto and alike there should be no dependencies
 
 Then within the .node-red directory, clone this repp
 
