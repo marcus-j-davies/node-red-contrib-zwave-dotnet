@@ -1,0 +1,1 @@
+C:\Users\2156\Downloads\node-red-contrib-zwave-dot-net\Server Project\Server\bin\Release\Server.exe.config

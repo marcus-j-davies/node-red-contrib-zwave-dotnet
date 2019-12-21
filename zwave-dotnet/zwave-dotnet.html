@@ -1,0 +1,70 @@
+﻿
+<script type="text/javascript">
+    
+    RED.nodes.registerType('zwave-dotnet',
+        {
+            category: 'Smart Home',
+            color: 'rgb(247,148,36)',
+            defaults:
+            {
+                serialPort: { value: "COM6" },
+                name: { value: "Zwave Controller" },
+               
+            },
+            inputs: 1,
+            outputs: 1,
+            icon: "ZWAVE.png",
+            label: function () {
+                return this.name;
+            }
+        });
+</script>
+
+<script type="text/x-red" data-template-name="zwave-dotnet">
+    <p>
+        Configure the  details below.<br /><br />
+        <strong>Name :</strong> Node name<br />
+        <strong>Serial Port :</strong> The serial port that the .Net process will use to connect to the USB zwave adapter.<br />
+    </p>
+    <br />
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Zwave Controller">
+    </div>
+    <div class="form-row">
+        <label for="node-input-serialPort"><i class="icon-tag"></i> Serial Port</label>
+        <input type="text" id="node-input-serialPort" placeholder="COM6, /dev/ttyAMA0">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="zwave-dotnet">
+    <p>A Zwave Controller for node red.</p>
+
+    <p>
+        <strong>Input:</strong><br />
+        A <strong>payload</strong> object containing a command to send to a ZWave device.<br />
+
+        <pre>{
+  "node": 2,
+  "operation": "SetConfiguration",
+  "operation_vars":[0x7,0]
+}</pre>
+    </p>
+   
+    <p>
+        <strong>Output:</strong><br />
+        A <strong>payload</strong> object containing an event that has occured within the zwave network.<br />
+        The example below is the response received, when sendng a <strong>GetConfiguration</strong> request. All responses bare the same format.
+        in this case - <strong>index</strong> represents the Configuration parameter. <strong>type</strong> will always be "NodeMessage".<br />
+        <strong>value</strong> can be simple types (ints, strings) or complex structures depending on the <strong>class</strong> that the event is asociated.
+        <pre>{
+  "type": "NodeMessage",
+  "node": 2,
+  "class": "Configuration",
+  "index": 31,
+  "value": 6,
+  "timestamp": "2019-12-15T21:14:34.3885835Z"
+}</pre>
+    </p>
+
+</script>

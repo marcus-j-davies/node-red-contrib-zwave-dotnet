@@ -1,0 +1,13 @@
+mkbundle \
+-z \
+--deps \
+--config DllMap.config \
+--simple \
+--static \
+--library MonoPosixHelper,/usr/lib/libMonoPosixHelper.so \
+--library System.Native,/usr/lib/libmono-native.so \
+--library System.Net.Security.Native,/usr/lib/libmono-native.so \
+--library libmono-btls-shared,/usr/lib/libmono-btls-shared.so \
+--library System.Security.Cryptography.Native.Apple,/usr/lib/libmono-native.so \
+--machine-config /etc/mono/4.5/machine.config \
+-o Server Server-Packed.exe

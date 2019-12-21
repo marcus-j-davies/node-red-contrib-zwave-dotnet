@@ -1,0 +1,6 @@
+C:\Users\2156\OneDrive - Space Engineering Services Ltd\Documents\Visual Studio 2015\Projects\node-red-contrib-zwave-dot-net\Server\bin\x64\Debug\Server.exe.config
+C:\Users\2156\OneDrive - Space Engineering Services Ltd\Documents\Visual Studio 2015\Projects\node-red-contrib-zwave-dot-net\Server\bin\x64\Debug\Server.exe
+C:\Users\2156\OneDrive - Space Engineering Services Ltd\Documents\Visual Studio 2015\Projects\node-red-contrib-zwave-dot-net\Server\bin\x64\Debug\Server.pdb
+C:\Users\2156\OneDrive - Space Engineering Services Ltd\Documents\Visual Studio 2015\Projects\node-red-contrib-zwave-dot-net\Server\bin\x64\Debug\Newtonsoft.Json.dll
+C:\Users\2156\OneDrive - Space Engineering Services Ltd\Documents\Visual Studio 2015\Projects\node-red-contrib-zwave-dot-net\Server\obj\x64\Debug\Server.exe
+C:\Users\2156\OneDrive - Space Engineering Services Ltd\Documents\Visual Studio 2015\Projects\node-red-contrib-zwave-dot-net\Server\obj\x64\Debug\Server.pdb
