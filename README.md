@@ -4,10 +4,8 @@ An extremely easy to use, feature rich, ZWave node for node-red.
 This node gives you the ability to interact with your ZWave devices right from node-red.
 At the heart of this node, is a .Net Executable that manages all the required transport components for ZWave, the executable is based on the awesome zwave-lib-dotnet source code (https://github.com/genielabs/zwave-lib-dotnet)
 
-The node is extremely easy to use, and only has 1 dependency (but only if you're a windows user)  
-  - For windows, ensure you have .Net 4.6.1 installed  
-  - For Ubunto and alike, there is no need to have Mono installed. I have been kind enough to package it all in a native binary.
-  
+The node is extremely easy to use, and only has 1 dependency - .Net/Mono. If running on a non windows platform,  
+I recommend installing mono-complete, to ensure a fully functional framework is available.  
 
 The node will recieve all events that are taking place in your ZWave network, and in turn will allow you to respond accordingly.
 
@@ -111,7 +109,7 @@ Example of building a notifcation report.
 All the solutions I have come across for connecting ZWave to node-red, involves various compiling of different libraries, and various configurations to take place. I am a very impatient person, so i decided to build my own solution, with the aim to make it far far easiyer compared to other solutions - not to discredit other solutions - they are awseome, just that, there is a lot more mileage involved to get them running.
 
 # Installing
-If you are running on windows - ensure you have .net 4.5 installed, for Ubunto and alike there should be no dependencies
+If you are running on windows - ensure you have .net 4.5 installed, or mono for other platforms
 
 Then within the .node-red directory, clone this repp
 
