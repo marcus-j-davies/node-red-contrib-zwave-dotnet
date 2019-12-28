@@ -28,20 +28,17 @@ module.exports = function (RED)
         });
 
         const ENV = process.env;
+        const EXEPath = __dirname + '/Server.exe';
+
         if (os.platform() == "win32")
         {
-            const EXEPath = __dirname + '/Windows/Server.exe';
             ServerProcess = spawn(EXEPath, [], { env: ENV, })
         }
-        else if (os.platform() == "linux")
+        else 
         {
-            const EXEPath = __dirname + '/Linux/Server';
-            ServerProcess = spawn(EXEPath,[], { env: ENV, })
+            ServerProcess = spawn("mono", [EXEPath], { env: ENV, })
         }
-        else
-        {
-            node.status({ fill: "red", shape: "dot", text: "Sorry - Platform currently not supported." });
-        }
+       
 
         ServerProcess.stdout.setEncoding('utf8');
 
