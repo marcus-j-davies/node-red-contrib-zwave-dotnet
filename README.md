@@ -108,7 +108,7 @@ Example of building a notifcation report.
 **DirectSerial** : See Below  
 
 # Direct Serial (CAUTION!!)
-WARNING! Using Direct Serial commands, bypasses all sanitisation offered by the Server/zwave lib - in essence, what you send, will be sent directly to your USB zwave controller. Sending an incorrect value, could, in theory harm/damage your controller if not used correctly. - **I am not responsable for any damage/harm caused to any piece of equipment/software as a result of using DirectSerial** 
+WARNING! Using Direct Serial commands, bypasses all sanitisation offered by the Server/zwave lib - in essence, what you send, will be sent directly to your USB zwave controller. Sending an incorrect value, could, in theory harm/damage your controller and other related equipment if not used correctly. - **I am not responsable for any damage/harm caused to any piece of equipment/software as a result of using DirectSerial** 
 
 Why would you use DirectSerial?
 DirectSerial allows you to directly send data to the USB controller. such as configuring its Power Level and other configuration values related to the controller, that is othrwise not supported by the zwave lib. It requires that you know how to contstruct the paylaod that it expects.
