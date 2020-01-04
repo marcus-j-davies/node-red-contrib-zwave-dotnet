@@ -87,8 +87,12 @@ Example of building a notifcation report.
 ```
 
 # Operation List
-**StartNodeAdd** (Does not require node object)  
-**StartNodeRemove** (Does not require node object)  
+The 4 commands below do not require a node object, as the command is addressed to the controller its self.  
+**StartNodeAdd**  
+**StartNodeRemove**  
+**StopNodeAdd**  
+**StopNodeRemove**  
+  
 **RawData** : raw[Byte Array]  
 **SetMultiLevelSwitch** : operation_vars[Integer]  
 **GetMultiLevelSwitch**  
