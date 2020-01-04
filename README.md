@@ -93,6 +93,7 @@ The 4 commands below do not require a node object, as the command is addressed t
 **StopNodeAdd**  
 **StopNodeRemove**  
   
+Basic controlling of zwave nodes  
 **RawData** : raw[Byte Array]  
 **SetMultiLevelSwitch** : operation_vars[Integer]  
 **GetMultiLevelSwitch**  
@@ -110,7 +111,8 @@ The 4 commands below do not require a node object, as the command is addressed t
 **GetBasic**  
 **GetBattery**  
 **SendNotificationReport** : operation_vars[Byte, Byte] (Type, Event)  
-  
+
+Direct Zwave Serial API commands   
 **DirectSerial** : See Below  
 
 # Direct Serial (CAUTION!!)
