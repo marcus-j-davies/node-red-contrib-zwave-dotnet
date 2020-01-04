@@ -79,13 +79,34 @@ namespace Server
                 Request _Request = Newtonsoft.Json.JsonConvert.DeserializeObject<Request>(Payload);
                 Dictionary<string, object> Status = new Dictionary<string, object>();
                 Status.Add("type", "SystemStatus");
-                Status.Add("value", "Sending : " + _Request.operation + " [NodeID:" + _Request.node + "] (" + DateTime.Now.ToString() + ")");
+                Status.Add("value", "Sending : " + _Request.operation + " [NodeID:" + _Request.node  + "] (" + DateTime.Now.ToString() + ")");
                 Status.Add("color", "yellow");
                 Send(Status);
 
 
                 switch (_Request.operation)
                 {
+
+                    //add
+                    case "StartNodeAdd":
+                        ZWC.BeginNodeAdd();
+                        break;
+
+                    // stop
+                    case "StopNodeAdd":
+                        ZWC.StopNodeAdd();
+                        break;
+
+                    // remove
+                    case "StartNodeRemove":
+                        ZWC.BeginNodeRemove();
+                        break;
+                        
+                    // stop
+                    case "StopNodeRemove":
+                        ZWC.StopNodeRemove();
+                        break;
+
 
                     // By Pass
                     case "DirectSerial":
@@ -225,6 +246,7 @@ namespace Server
 
             ZWC.ControllerStatusChanged += ZWC_ControllerStatusChanged;
             ZWC.NodeUpdated += ZWC_NodeUpdated;
+            ZWC.NodeOperationProgress += ZWC_NodeOperationProgress;
             
 
          
@@ -239,7 +261,23 @@ namespace Server
             ZWC.Connect();
         }
 
-     
+        private static void ZWC_NodeOperationProgress(object sender, ZWaveLib.NodeOperationProgressEventArgs args)
+        {
+            Dictionary<string, object> Payload = new Dictionary<string, object>();
+
+            
+
+            Payload.Add("type", "NodeMessage");
+            Payload.Add("node", args.NodeId);
+            Payload.Add("class", "NodeOperation");
+            Payload.Add("index", 0);
+            Payload.Add("value", args.Status.ToString());
+            Payload.Add("timestamp", args.Timestamp);
+
+            Send(Payload);
+
+          
+        }
 
         private static void SendRaw(byte NodeID, byte[] RawData)
         {
