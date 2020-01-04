@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
+using System.Reflection;
 
 namespace Server
 {
@@ -16,6 +17,7 @@ namespace Server
         static ZWaveLib.ZWaveController ZWC = null;
         static bool Inited = false;
         static string SerialPort = string.Empty;
+        static SerialPortLib.SerialPortInput SPI = null;
 
         private static void Send(Dictionary<string, object> Payload)
         {
@@ -84,6 +86,12 @@ namespace Server
 
                 switch (_Request.operation)
                 {
+
+                    // By Pass
+                    case "DirectSerial":
+                        SendSerial(_Request.raw);
+                        break;
+
 
                     // Raw
                     case "RawData":
@@ -213,6 +221,8 @@ namespace Server
 
             ZWC = new ZWaveLib.ZWaveController(SerialPort);
 
+            SPI =  (SerialPortLib.SerialPortInput)ZWC.GetType().GetField("serialPort", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(ZWC);
+
             ZWC.ControllerStatusChanged += ZWC_ControllerStatusChanged;
             ZWC.NodeUpdated += ZWC_NodeUpdated;
             
@@ -288,6 +298,11 @@ namespace Server
             ZWaveLib.ZWaveMessage Message = new ZWaveLib.ZWaveMessage(Result);
             ZWC.QueueMessage(Message);
         } 
+
+        private static void SendSerial(byte[] Raw)
+        {
+            SPI.SendMessage(Raw);
+        }
 
         private static void ZWC_NodeUpdated(object sender, ZWaveLib.NodeUpdatedEventArgs args)
         {
