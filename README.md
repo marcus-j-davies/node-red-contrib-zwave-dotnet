@@ -87,6 +87,8 @@ Example of building a notifcation report.
 ```
 
 # Operation List
+**StartNodeAdd** (Does not require node object)  
+**StartNodeRemove** (Does not require node object)  
 **RawData** : raw[Byte Array]  
 **SetMultiLevelSwitch** : operation_vars[Integer]  
 **GetMultiLevelSwitch**  
