@@ -1,12 +1,13 @@
 {
   "name": "node-red-contrib-zwave-dot-net",
   "version": "0.0.1",
+  "license" : "MIT",
   "description": "A Zwave Controller for node-red built on the zwave-lib-dotnet library.",
   "dependencies": {
     "child_process": "1.0.2",
     "os": "0.1.1"
   },
-  "keywords": [ "node-red", "zwave",".net","controller" ],
+  "keywords": [ "node-red", "zwave",".net","controller","smart","automation" ],
   "node-red": {
     "nodes": {
       "zwave-dotnet": "zwave-dotnet/zwave-dotnet.js"
