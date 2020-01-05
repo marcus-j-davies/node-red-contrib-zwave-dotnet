@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-zwave-dot-net",
-  "version": "0.0.1",
+  "version": "0.3.2",
   "description": "A Zwave Controller for node-red built on the zwave-lib-dotnet library.",
   "dependencies": {
     "child_process": "1.0.2",
