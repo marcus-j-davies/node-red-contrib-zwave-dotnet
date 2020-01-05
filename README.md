@@ -112,7 +112,7 @@ Basic controlling of zwave nodes
 **GetBattery**  
 **SendNotificationReport** : operation_vars[Byte, Byte] (Type, Event)  
 
-Direct Zwave Serial API commands   
+Expert / Advanced Operations 
 **DirectSerial** : See Below  
 
 # Direct Serial (CAUTION!!)
