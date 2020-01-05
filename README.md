@@ -1,4 +1,4 @@
-# node-red-contrib-zwave-dot-net
+# node-red-contrib-zwave-dotnet
 An extremely easy to use, feature rich, ZWave node for node-red.
 
 This node gives you the ability to interact with your ZWave devices right from node-red.
