@@ -94,23 +94,23 @@ The 4 commands below do not require a node object, as the command is addressed t
 **StopNodeRemove**  
   
 Basic controlling of zwave nodes  
-**RawData** : raw[Byte Array]  
-**SetMultiLevelSwitch** : operation_vars[Integer]  
+**RawData** : raw [Byte Array]  
+**SetMultiLevelSwitch** : operation_vars [Integer]  
 **GetMultiLevelSwitch**  
-**SetThermostatMode** : operation_vars[String] (see Thermostat Modes)  
+**SetThermostatMode** : operation_vars [String] (see Thermostat Modes)  
 **GetThermostatMode**  
-**SetThermostatSetPoint** : operation_vars[String, Double] (see Thermostat Modes)  
-**GetThermostatSetPoint** : operation_vars[String] (see Thermostat Modes)  
-**SetWakeInterval** : operation_vars[Integer] (seconds)  
+**SetThermostatSetPoint** : operation_vars [String, Double] (see Thermostat Modes)  
+**GetThermostatSetPoint** : operation_vars [String] (see Thermostat Modes)  
+**SetWakeInterval** : operation_vars [Integer] (seconds)  
 **GetWakeInterval**  
-**SetConfiguration** : operation_vars[Byte, Integer] (Parameter, Value)  
-**GetConfiguration** : operation_vars[Byte] (Parameter)  
-**SetBinary** : operation_vars[Boolean]  
+**SetConfiguration** : operation_vars [Byte, Integer] (Parameter, Value)  
+**GetConfiguration** : operation_vars [Byte] (Parameter)  
+**SetBinary** : operation_vars [Boolean]  
 **GetBinary**  
-**SetBasic** : operation_vars[Integer]  
+**SetBasic** : operation_vars [Integer]  
 **GetBasic**  
 **GetBattery**  
-**SendNotificationReport** : operation_vars[Byte, Byte] (Type, Event)  
+**SendNotificationReport** : operation_vars [Byte, Byte] (Type, Event)  
 
 Expert / Advanced Operations  
 **DirectSerial** : See Below  
