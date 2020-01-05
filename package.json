@@ -11,6 +11,7 @@
   "node-red": {
     "nodes": {
       "zwave-dotnet": "zwave-dotnet/zwave-dotnet.js"
-    }
+    },
+    "main" : "zwave-dotnet/zwave-dotnet.js"
   }
 }
