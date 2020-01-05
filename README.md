@@ -164,7 +164,7 @@ git clone https://github.com/marcus-j-davies/node-red-contrib-zwave-dotnet.git
 Then install (you will need to restart node-red after)
 
 ```
-npm install ./node-red-contrib-zwave-dot-net
+npm install ./node-red-contrib-zwave-dotnet
 ```
 
 # Configuration
