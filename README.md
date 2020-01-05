@@ -97,20 +97,20 @@ Basic controlling of zwave nodes
 **RawData** : raw [Byte Array]  
 **SetMultiLevelSwitch** : operation_vars [Integer]  
 **GetMultiLevelSwitch**  
-**SetThermostatMode** : operation_vars [String] (see Thermostat Modes)  
+**SetThermostatMode** : operation_vars [String] - (see Thermostat Modes)  
 **GetThermostatMode**  
-**SetThermostatSetPoint** : operation_vars [String, Double] (see Thermostat Modes)  
-**GetThermostatSetPoint** : operation_vars [String] (see Thermostat Modes)  
-**SetWakeInterval** : operation_vars [Integer] (seconds)  
+**SetThermostatSetPoint** : operation_vars [String, Double] - (see Thermostat Modes)  
+**GetThermostatSetPoint** : operation_vars [String] - (see Thermostat Modes)  
+**SetWakeInterval** : operation_vars [Integer] - (seconds)  
 **GetWakeInterval**  
-**SetConfiguration** : operation_vars [Byte, Integer] (Parameter, Value)  
-**GetConfiguration** : operation_vars [Byte] (Parameter)  
+**SetConfiguration** : operation_vars [Byte, Integer] - (parameter,value)  
+**GetConfiguration** : operation_vars [Byte] - (parameter)  
 **SetBinary** : operation_vars [Boolean]  
 **GetBinary**  
 **SetBasic** : operation_vars [Integer]  
 **GetBasic**  
 **GetBattery**  
-**SendNotificationReport** : operation_vars [Byte, Byte] (Type, Event)  
+**SendNotificationReport** : operation_vars [Byte, Byte] - (Type,Event)  
 
 Expert / Advanced Operations  
 **DirectSerial** : See Below  
