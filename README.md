@@ -153,7 +153,9 @@ All the solutions I have come across for connecting ZWave to node-red, involves 
 # Installing
 If you are running on windows - ensure you have .net 4.5 installed, or mono for other platforms
 
-Then within the .node-red directory, clone this repp
+Use Node Red's Manage Pallet menu or alternatively....
+
+Within the .node-red directory, clone this repp
 
 ```
 git clone https://github.com/marcus-j-davies/node-red-contrib-zwave-dot-net.git
