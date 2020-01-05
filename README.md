@@ -97,14 +97,14 @@ Basic controlling of zwave nodes
 **RawData** : raw[Byte Array]  
 **SetMultiLevelSwitch** : operation_vars[Integer]  
 **GetMultiLevelSwitch**  
-**SetThermostatMode** : operation_vars[String]  
+**SetThermostatMode** : operation_vars[String] (see Thermostat Modes)  
 **GetThermostatMode**  
-**SetThermostatSetPoint** : operation_vars[String, Double]  
-**GetThermostatSetPoint** : operation_vars[String]  
+**SetThermostatSetPoint** : operation_vars[String, Double] (see Thermostat Modes)  
+**GetThermostatSetPoint** : operation_vars[String] (see Thermostat Modes)  
 **SetWakeInterval** : operation_vars[Integer] (seconds)  
 **GetWakeInterval**  
 **SetConfiguration** : operation_vars[Byte, Integer] (Parameter, Value)  
-**SetConfiguration** : operation_vars[Byte] (Parameter)  
+**GetConfiguration** : operation_vars[Byte] (Parameter)  
 **SetBinary** : operation_vars[Boolean]  
 **GetBinary**  
 **SetBasic** : operation_vars[Integer]  
@@ -130,6 +130,22 @@ Disabling the LED on the Aeotec Gen5 Z Stick (you do not need to specify a node 
 }
 ```
 The difference between **RawData** and **DirectSerial** is that RawData requires a valid zwave packet, and the node that it should be addressed to. DirectSerial on the other hand, is asking you to construct a serial api request. see (https://www.silabs.com/documents/login/user-guides/INS12350-Serial-API-Host-Appl.-Prg.-Guide.pdf)
+
+# Thermostat Modes
+Off  
+Heat  
+Cool  
+Auto  
+AuxHeat  
+Resume  
+FanOnly  
+Furnace  
+DryAir  
+MoistAir  
+AutoChangeover  
+HeatEconomy  
+CoolEconomy  
+Away  
 
 # Why?
 All the solutions I have come across for connecting ZWave to node-red, involves various compiling of different libraries, and various configurations to take place. I am a very impatient person, so i decided to build my own solution, with the aim to make it far far easiyer compared to other solutions - not to discredit other solutions - they are awseome, just that, there is a lot more mileage involved to get them running.
