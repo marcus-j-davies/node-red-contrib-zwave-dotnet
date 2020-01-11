@@ -86,7 +86,7 @@ Example of building a notifcation report.
 }
 ```
 
-# Operation List
+## Operation List
 The 4 commands below do not require a node object, as the command is addressed to the controller its self.  
 **StartNodeAdd**  
 **StartNodeRemove**  
@@ -115,7 +115,7 @@ Basic controlling of zwave nodes
 Expert / Advanced Operations  
 **DirectSerial** : See Below  
 
-# Direct Serial (CAUTION!!)
+## Direct Serial (CAUTION!!)
 WARNING! Using Direct Serial commands, bypasses all sanitisation offered by the Server/zwave lib - in essence, what you send, will be sent directly to your USB zwave controller. Sending an incorrect value, could, in theory harm/damage your controller and other related equipment if not used correctly. - **I am not responsable for any damage/harm caused to any piece of equipment/software as a result of using DirectSerial** 
 
 Why would you use DirectSerial?
@@ -131,7 +131,7 @@ Disabling the LED on the Aeotec Gen5 Z Stick (you do not need to specify a node 
 ```
 The difference between **RawData** and **DirectSerial** is that RawData requires a valid zwave packet, and the node that it should be addressed to. DirectSerial on the other hand, is asking you to construct a serial api request. see (https://www.silabs.com/documents/login/user-guides/INS12350-Serial-API-Host-Appl.-Prg.-Guide.pdf)
 
-# Thermostat Modes
+## Thermostat Modes
 Off  
 Heat  
 Cool  
@@ -147,10 +147,10 @@ HeatEconomy
 CoolEconomy  
 Away  
 
-# Why?
+## Why?
 All the solutions I have come across for connecting ZWave to node-red, involves various compiling of different libraries, and various configurations to take place. I am a very impatient person, so i decided to build my own solution, with the aim to make it far far easiyer compared to other solutions - not to discredit other solutions - they are awseome, just that, there is a lot more mileage involved to get them running.
 
-# Installing
+## Installing
 If you are running on windows - ensure you have .net 4.5 installed, or mono for other platforms.
 
 Use the Node Red Palette menu or alternatively...
@@ -167,9 +167,9 @@ Then install (you will need to restart node-red after)
 npm install ./node-red-contrib-zwave-dotnet
 ```
 
-# Configuration
+## Configuration
 There is only 1 configuration value that you need to amend, and that is the serial port address. Double click the node when its in your flow to modify it.
 
-# Version History
-  - 1.0.0
+## Version History
+  - 1.0.0  
     Initial Release
