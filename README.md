@@ -169,3 +169,7 @@ npm install ./node-red-contrib-zwave-dotnet
 
 # Configuration
 There is only 1 configuration value that you need to amend, and that is the serial port address. Double click the node when its in your flow to modify it.
+
+# Version History
+  - 1.0.0
+    Initial Release
