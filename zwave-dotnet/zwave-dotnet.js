@@ -1,5 +1,6 @@
 module.exports = function (RED)
 {
+    const SP = require("serialport");
     function Init(config)
     {
         const node = this;
@@ -88,5 +89,17 @@ module.exports = function (RED)
    
 
     RED.nodes.registerType("zwave-dotnet", Init);
+
+    RED.httpAdmin.get("/zwdngetports", RED.auth.needsPermission('serial.read'), function (req, res) {
+        SP.list().then(
+            ports => {
+                const a = ports.map(p => p.path);
+                res.json(a);
+            },
+            err => {
+                node.log('Error listing serial ports', err)
+            }
+        )
+    });
 
 }
