@@ -171,7 +171,11 @@ npm install ./node-red-contrib-zwave-dotnet
 There is only 1 configuration value that you need to amend, and that is the serial port address. Double click the node when its in your flow to modify it.
 
 ## Version History
+  - 1.1.1  
+    Fixed a potential issue where duplicated instances of the zwave router executable could be running.
+    
   - 1.1.0  
-    Added drop down for serial port, removing the need to enter it manually
+    Added drop down for serial port, removing the need to enter it manually  
+        
   - 1.0.0  
     Initial Release

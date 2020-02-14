@@ -15,10 +15,12 @@ module.exports = function (RED)
         let ServerProcess;
         let LineReader;
 
-        node.on('close', function ()
+        node.on('close', function (done)
         {
           
             ServerProcess.kill('SIGTERM');
+
+            done();
         });
 
         node.on('input', function (msg)
