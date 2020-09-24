@@ -247,6 +247,7 @@ namespace Server
             ZWC.ControllerStatusChanged += ZWC_ControllerStatusChanged;
             ZWC.NodeUpdated += ZWC_NodeUpdated;
             ZWC.NodeOperationProgress += ZWC_NodeOperationProgress;
+            ZWC.DiscoveryProgress += ZWC_DiscoveryProgress;
             
 
          
@@ -259,6 +260,20 @@ namespace Server
 
 
             ZWC.Connect();
+        }
+
+        private static void ZWC_DiscoveryProgress(object sender, ZWaveLib.DiscoveryProgressEventArgs args)
+        {
+            Dictionary<string, object> Status = new Dictionary<string, object>();
+
+            if (args.Status == ZWaveLib.DiscoveryStatus.DiscoveryEnd)
+            {
+                Status.Add("type", "SystemStatus");
+                Status.Add("value", "ZWave Controller Ready");
+                Status.Add("color", "green");
+                Send(Status);
+                Inited = true;
+            }
         }
 
         private static void ZWC_NodeOperationProgress(object sender, ZWaveLib.NodeOperationProgressEventArgs args)
@@ -383,10 +398,10 @@ namespace Server
                 case ZWaveLib.ControllerStatus.Ready:
 
                     Status.Add("type", "SystemStatus");
-                    Status.Add("value", "ZWave Controller Ready");
-                    Status.Add("color", "green");
+                    Status.Add("value", "Scanning node capabilities...");
+                    Status.Add("color", "yellow");
                     Send(Status);
-                    Inited = true;
+                    ZWC.Discovery();
 
                     break;
 
