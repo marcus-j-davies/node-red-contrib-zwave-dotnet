@@ -54,7 +54,7 @@
 
 <script type="text/x-red" data-template-name="zwave-dotnet">
     <p>
-        Configure the  details below.<br /><br />
+        Configure the details below.<br /><br />
         <strong>Name :</strong> Node name<br />
         <strong>Serial Port :</strong> The serial port that the .Net process will use to connect to the USB zwave adapter.<br />
     </p>
@@ -90,10 +90,9 @@
         <strong>Output:</strong><br />
         A <strong>payload</strong> object containing an event that has occured within the zwave network.<br />
         The example below is the response received, when sendng a <strong>GetConfiguration</strong> request. All responses bare the same format.
-        in this case - <strong>index</strong> represents the Configuration parameter. <strong>type</strong> will always be "NodeMessage".<br />
-        <strong>value</strong> can be simple types (ints, strings) or complex structures depending on the <strong>class</strong> that the event is asociated.
+        in this case - <strong>index</strong> represents the Configuration parameter.<br />
+        <strong>value</strong> can be simple types (ints, strings) or complex structures depending on the <strong>class</strong> that the event is associated.
         <pre>{
-  "type": "NodeMessage",
   "node": 2,
   "class": "Configuration",
   "index": 31,

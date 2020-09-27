@@ -369,13 +369,6 @@ namespace Server
 
             Send(Payload);
 
-            Payload = new Dictionary<string, object>();
-
-            Payload.Add("type", "SystemStatus");
-            Payload.Add("value", "Received : " + args.Event.Parameter.ToString() + " [NodeID:" + args.NodeId + "] (" + DateTime.Now.ToString() + ")");
-            Payload.Add("color", "green");
-
-            Send(Payload);
 
 
 

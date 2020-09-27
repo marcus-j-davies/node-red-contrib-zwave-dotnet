@@ -16,3 +16,4 @@ C:\Users\2156\node-red-contrib-zwave-dot-net\Server Project (VS2015)\Server\bin\
 C:\Users\2156\node-red-contrib-zwave-dot-net\Server Project (VS2015)\Server\bin\x64\Debug\NLog.xml
 C:\Users\2156\node-red-contrib-zwave-dot-net\Server Project (VS2015)\Server\bin\x64\Debug\SerialPortLib.xml
 C:\Users\2156\node-red-contrib-zwave-dot-net\Server Project (VS2015)\Server\bin\x64\Debug\ZWaveLib.xml
+C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\bin\x64\Debug\Server.exe.config
