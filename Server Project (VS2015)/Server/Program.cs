@@ -86,6 +86,7 @@ namespace Server
 
                 ZWaveLib.CommandClasses.ThermostatMode.Value TSMV;
                 ZWaveLib.CommandClasses.ThermostatSetPoint.Value TSPV;
+                ZWaveLib.ZWaveMessage Message;
                 byte[] Result;
 
 
@@ -137,7 +138,7 @@ namespace Server
                     // Raw
                     case "RawZWaveMessage":
                         Result = ZWaveLib.ZWaveMessage.BuildSendDataRequest(_Request.node, _Request.raw);
-                        ZWaveLib.ZWaveMessage Message = new ZWaveLib.ZWaveMessage(Result);
+                        Message = new ZWaveLib.ZWaveMessage(Result);
                         ZWC.QueueMessage(Message);
 
                         break;
@@ -155,6 +156,7 @@ namespace Server
                     case "SetThermostatMode":
                         TSMV = (ZWaveLib.CommandClasses.ThermostatMode.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatMode.Value), Convert.ToString(_Request.operation_vars[0]));
                         ZWaveLib.CommandClasses.ThermostatMode.Set(ZWC.GetNode(_Request.node), TSMV);
+
 
                         break;
 
@@ -196,7 +198,7 @@ namespace Server
 
                     // Binary
                     case "SetBinary":
-                        SetBinary(_Request.node, Convert.ToBoolean(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.SwitchBinary.Set(ZWC.GetNode(_Request.node), Convert.ToInt32(Convert.ToBoolean(_Request.operation_vars[0])));
                         break;
 
                     case "GetBinary":
@@ -205,7 +207,7 @@ namespace Server
 
                     // Basic
                     case "SetBasic":
-                        SetBasic(_Request.node, Convert.ToInt32(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.Basic.Set(ZWC.GetNode(_Request.node), Convert.ToInt32(_Request.operation_vars[0]));
                         break;
 
                     case "GetBasic":
@@ -220,7 +222,17 @@ namespace Server
 
                     // Notification
                     case "SendNotificationReport":
-                        SendNotificationReport(_Request.node, Convert.ToByte(_Request.operation_vars[0]), Convert.ToByte(_Request.operation_vars[1]));
+                        byte[] MessageBytes = new byte[10];
+                        MessageBytes[0] = 0x71;
+                        MessageBytes[1] = 0x05;
+                        MessageBytes[6] = Convert.ToByte(_Request.operation_vars[0]);
+                        MessageBytes[7] = Convert.ToByte(_Request.operation_vars[1]);
+
+                        Result = ZWaveLib.ZWaveMessage.BuildSendDataRequest(_Request.node, MessageBytes);
+                        Message = new ZWaveLib.ZWaveMessage(Result);
+                        ZWC.QueueMessage(Message);
+
+
                         break;
 
                     default:
@@ -321,52 +333,6 @@ namespace Server
 
           
         }
-
-      
-
-       
-
-        private static void SetThermostatSetPoint(byte NodeID, string Setpoint,double DValue)
-        {
-            ZWaveLib.CommandClasses.ThermostatSetPoint.Value Value = (ZWaveLib.CommandClasses.ThermostatSetPoint.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatSetPoint.Value), Setpoint);
-            ZWaveLib.CommandClasses.ThermostatSetPoint.Set(ZWC.GetNode(NodeID),Value, DValue);
-        }
-
-
-        private static void SetWakeInterval(byte NodeID, uint Seconds)
-        {
-            ZWaveLib.CommandClasses.WakeUp.Set(ZWC.GetNode(NodeID), Seconds);
-        }
-
-        private static void SetConfiguration(byte NodeID, byte Parameter, int Value)
-        {
-            ZWaveLib.CommandClasses.Configuration.Set(ZWC.GetNode(NodeID), Parameter, Value);
-        }
-
-        private static void SetBinary(byte NodeID, bool Value)
-        {
-            ZWaveLib.CommandClasses.SwitchBinary.Set(ZWC.GetNode(NodeID), Convert.ToInt32(Value));
-        }
-
-        private static void SetBasic(byte NodeID, int Value)
-        {
-            ZWaveLib.CommandClasses.Basic.Set(ZWC.GetNode(NodeID), Value);
-        }
-
-        private static void SendNotificationReport(byte NodeID, byte Type, byte Event)
-        {
-            byte[] MessageBytes = new byte[10];
-            MessageBytes[0] = 0x71;
-            MessageBytes[1] = 0x05;
-            MessageBytes[6] = Type;
-            MessageBytes[7] = Event;
-
-            byte[] Result = ZWaveLib.ZWaveMessage.BuildSendDataRequest(NodeID, MessageBytes);
-            ZWaveLib.ZWaveMessage Message = new ZWaveLib.ZWaveMessage(Result);
-            ZWC.QueueMessage(Message);
-        } 
-
-       
 
         private static void ZWC_NodeUpdated(object sender, ZWaveLib.NodeUpdatedEventArgs args)
         {
