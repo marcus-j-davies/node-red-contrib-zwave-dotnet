@@ -84,8 +84,28 @@ namespace Server
                 Send(Status);
 
 
+                ZWaveLib.CommandClasses.ThermostatMode.Value TSMV;
+                ZWaveLib.CommandClasses.ThermostatSetPoint.Value TSPV;
+                byte[] Result;
+
+
+
                 switch (_Request.operation)
                 {
+                    // Soft Reset
+                    case "SoftReset":
+                        ZWC.SoftReset();
+                        break;
+
+                    // Hard Reset
+                    case "HardReset":
+                        ZWC.HardReset();
+                        break;
+
+                    // heal
+                    case "HealNetwork":
+                        ZWC.HealNetwork();
+                        break;
 
                     //add
                     case "StartNodeAdd":
@@ -109,19 +129,22 @@ namespace Server
 
 
                     // By Pass
-                    case "DirectSerial":
-                        SendSerial(_Request.raw);
+                    case "SerialAPIMessage":
+                        SPI.SendMessage(_Request.raw);
                         break;
 
 
                     // Raw
-                    case "RawData":
-                        SendRaw(_Request.node, _Request.raw);
+                    case "RawZWaveMessage":
+                        Result = ZWaveLib.ZWaveMessage.BuildSendDataRequest(_Request.node, _Request.raw);
+                        ZWaveLib.ZWaveMessage Message = new ZWaveLib.ZWaveMessage(Result);
+                        ZWC.QueueMessage(Message);
+
                         break;
 
                     // MultiLevel
                     case "SetMultiLevelSwitch":
-                        SetMultiSwitch(_Request.node, Convert.ToInt32(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.SwitchMultilevel.Set(ZWC.GetNode(_Request.node), Convert.ToInt32(_Request.operation_vars[0]));
                         break;
 
                     case "GetMultiLevelSwitch":
@@ -130,7 +153,9 @@ namespace Server
 
                     // Thermostate Mode
                     case "SetThermostatMode":
-                        SetThermostatMode(_Request.node, Convert.ToString(_Request.operation_vars[0]));
+                        TSMV = (ZWaveLib.CommandClasses.ThermostatMode.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatMode.Value), Convert.ToString(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.ThermostatMode.Set(ZWC.GetNode(_Request.node), TSMV);
+
                         break;
 
                     case "GetThermostatMode":
@@ -139,18 +164,21 @@ namespace Server
 
                     // Thermostate Setpoint
                     case "SetThermostatSetPoint":
-                        SetThermostatSetPoint(_Request.node, Convert.ToString(_Request.operation_vars[0]), Convert.ToDouble(_Request.operation_vars[1]));
+                        TSPV  = (ZWaveLib.CommandClasses.ThermostatSetPoint.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatSetPoint.Value), Convert.ToString(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.ThermostatSetPoint.Set(ZWC.GetNode(_Request.node), TSPV, Convert.ToDouble(_Request.operation_vars[1]));
+
+
                         break;
 
                     case "GetThermostatSetPoint":
-                        ZWaveLib.CommandClasses.ThermostatSetPoint.Value Value = (ZWaveLib.CommandClasses.ThermostatSetPoint.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatSetPoint.Value), Convert.ToString(_Request.operation_vars[0]));
-                        ZWaveLib.CommandClasses.ThermostatSetPoint.Get(ZWC.GetNode(_Request.node), Value);
+                        TSPV = (ZWaveLib.CommandClasses.ThermostatSetPoint.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatSetPoint.Value), Convert.ToString(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.ThermostatSetPoint.Get(ZWC.GetNode(_Request.node), TSPV);
                         break;
 
 
                     // Wake up
                     case "SetWakeInterval":
-                        SetWakeInterval(_Request.node, Convert.ToUInt32(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.WakeUp.Set(ZWC.GetNode(_Request.node), Convert.ToUInt32(_Request.operation_vars[0]));
                         break;
 
                     case "GetWakeInterval":
@@ -159,7 +187,7 @@ namespace Server
 
                     // Config
                     case "SetConfiguration":
-                        SetConfiguration(_Request.node, Convert.ToByte(_Request.operation_vars[0]), Convert.ToInt32(_Request.operation_vars[1]));
+                        ZWaveLib.CommandClasses.Configuration.Set(ZWC.GetNode(_Request.node), Convert.ToByte(_Request.operation_vars[0]), Convert.ToInt32(_Request.operation_vars[1]));
                         break;
 
                     case "GetConfiguration":
@@ -294,23 +322,9 @@ namespace Server
           
         }
 
-        private static void SendRaw(byte NodeID, byte[] RawData)
-        {
-            byte[] Result = ZWaveLib.ZWaveMessage.BuildSendDataRequest(NodeID, RawData);
-            ZWaveLib.ZWaveMessage Message = new ZWaveLib.ZWaveMessage(Result);
-            ZWC.QueueMessage(Message);
-        }
+      
 
-        private static void SetMultiSwitch(byte NodeID, int Value)
-        {
-            ZWaveLib.CommandClasses.SwitchMultilevel.Set(ZWC.GetNode(NodeID), Value);
-        }
-
-        private static void SetThermostatMode(byte NodeID, string Mode)
-        {
-            ZWaveLib.CommandClasses.ThermostatMode.Value Value = (ZWaveLib.CommandClasses.ThermostatMode.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatMode.Value), Mode);
-            ZWaveLib.CommandClasses.ThermostatMode.Set(ZWC.GetNode(NodeID), Value);
-        }
+       
 
         private static void SetThermostatSetPoint(byte NodeID, string Setpoint,double DValue)
         {
@@ -352,10 +366,7 @@ namespace Server
             ZWC.QueueMessage(Message);
         } 
 
-        private static void SendSerial(byte[] Raw)
-        {
-            SPI.SendMessage(Raw);
-        }
+       
 
         private static void ZWC_NodeUpdated(object sender, ZWaveLib.NodeUpdatedEventArgs args)
         {
