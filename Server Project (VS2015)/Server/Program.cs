@@ -18,51 +18,73 @@ namespace Server
         static bool Inited = false;
         static string SerialPort = string.Empty;
         static SerialPortLib.SerialPortInput SPI = null;
+        static Socket ServerSocket = null;
+        static Socket NRClientSocket = null;
 
         private static void Send(Dictionary<string, object> Payload)
         {
             string JSON = Newtonsoft.Json.JsonConvert.SerializeObject(Payload);
-            Console.Out.WriteLine(JSON);
+            byte[] Data = System.Text.Encoding.UTF8.GetBytes(JSON);
+            SendData(Data, NRClientSocket);
         }
        
         static void Main(string[] args)
         {
-            
-
             Begin();
+        }
+
+        private static byte[] ReadData(int Length, Socket S)
+        {
+            byte[] ReceiveBuffer = new byte[Length];
+            S.Receive(ReceiveBuffer, Length, SocketFlags.None);
+
+            return ReceiveBuffer;
+        }
+
+        private static void SendData(byte[] Data, Socket S)
+        {
+            int MessageLength = Data.Length;
+            byte[] LengthBytes = BitConverter.GetBytes(MessageLength);
+            S.Send(LengthBytes, LengthBytes.Length, SocketFlags.None);
+            S.Send(Data, Data.Length, SocketFlags.None);
         }
 
         private static void Begin()
         {
+            ServerSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            ServerSocket.Bind(new IPEndPoint(IPAddress.Loopback, 45342));
+            ServerSocket.Listen(0);
+
             new System.Threading.Thread(() =>
             {
                 while (true)
                 {
-                    string Payload = Console.In.ReadLine();
+                    NRClientSocket = ServerSocket.Accept();
 
-                    switch (Payload)
+                    int PortStringLength = BitConverter.ToInt32(ReadData(4, NRClientSocket),0);
+                    byte[] PortStringBytes = ReadData(PortStringLength, NRClientSocket);
+
+                    SerialPort = System.Text.Encoding.UTF8.GetString(PortStringBytes);
+
+                    Init();
+
+                    while(true)
                     {
-                        case "INIT":
-                            SerialPort = Console.In.ReadLine();
-                            Init();
-                            break;
+                        int MessageStringLength = BitConverter.ToInt32(ReadData(4, NRClientSocket), 0);
+                        byte[] MessageBytes = ReadData(MessageStringLength, NRClientSocket);
 
-                        default:
-                            if(Inited)
-                            {
-                                Process(Payload);
-                            }
-                            
-                            break;
+                        if(Inited)
+                        {
+                            Process(System.Text.Encoding.UTF8.GetString(MessageBytes));
+                        }
+
                     }
+
+
+                   
                 }
 
             }).Start();
-
-
-
-
-            Console.Out.WriteLine("READY");
 
             System.Threading.Thread.Sleep(-1);
 

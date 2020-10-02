@@ -1,13 +1,59 @@
 module.exports = function (RED)
 {
     const SP = require("serialport");
+    const net = require('net');
+    
     function Init(config)
     {
         const node = this;
         RED.nodes.createNode(this, config);
+        let Reading = false;
+
         node.status({ fill: "yellow", shape: "dot", text: "Initializing server..." });
 
+        
+
         const spawn = require('child_process').spawn;
+        const SOK = net.createConnection(45342, '127.0.0.1', () =>
+        {
+            if (!Reading)
+            {
+                Reading = true;
+                SOK.on("readable", readData)
+            }
+           
+           
+            
+        });
+
+        function readData()
+        {
+            
+            let LBytes = SOK.read(4)
+            if(LBytes)
+            {
+                let MSGSize = LBytes.readInt32LE(0)
+                let Data = SOK.read(MSGSize).toString()
+                ProcessMessage(JSON.parse(Data));
+
+                readData();
+            }
+            else
+            {
+
+                Reading = false;
+            }
+           
+
+           
+
+
+
+
+
+
+        }
+        
 
         const os = require('os')
         const RL = require('readline')
