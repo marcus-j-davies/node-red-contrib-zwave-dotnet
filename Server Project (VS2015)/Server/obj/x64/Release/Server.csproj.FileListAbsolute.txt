@@ -30,14 +30,3 @@ C:\Users\2156\node-red-contrib-zwave-dot-net UP\Server Project (VS2015)\Server\b
 C:\Users\2156\node-red-contrib-zwave-dot-net UP\Server Project (VS2015)\Server\bin\x64\Release\SerialPortLib.xml
 C:\Users\2156\node-red-contrib-zwave-dot-net UP\Server Project (VS2015)\Server\bin\x64\Release\ZWaveLib.xml
 C:\Users\2156\node-red-contrib-zwave-dot-net UP\Server Project (VS2015)\Server\obj\x64\Release\Server.csprojResolveAssemblyReference.cache
-C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\bin\x64\Release\Server.exe.config
-C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\bin\x64\Release\Server.exe
-C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\bin\x64\Release\Newtonsoft.Json.dll
-C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\bin\x64\Release\NLog.dll
-C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\bin\x64\Release\SerialPortLib.dll
-C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\bin\x64\Release\ZWaveLib.dll
-C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\bin\x64\Release\NLog.xml
-C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\bin\x64\Release\SerialPortLib.pdb
-C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\bin\x64\Release\ZWaveLib.pdb
-C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\obj\x64\Release\Server.csprojResolveAssemblyReference.cache
-C:\Users\2156\GHDT\Projects\node-red-contrib-zwave-dotnet\Server Project (VS2015)\Server\obj\x64\Release\Server.exe

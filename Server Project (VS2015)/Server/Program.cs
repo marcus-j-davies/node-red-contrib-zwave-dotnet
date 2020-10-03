@@ -21,6 +21,11 @@ namespace Server
         static Socket ServerSocket = null;
         static Socket NRClientSocket = null;
 
+        static void Main(string[] args)
+        {
+            Begin();
+        }
+
         private static void Send(Dictionary<string, object> Payload)
         {
             string JSON = Newtonsoft.Json.JsonConvert.SerializeObject(Payload);
@@ -28,25 +33,13 @@ namespace Server
             SendData(Data, NRClientSocket);
         }
        
-        static void Main(string[] args)
-        {
-            Begin();
-        }
-
-        private static byte[] ReadData(int Length, Socket S)
-        {
-            byte[] ReceiveBuffer = new byte[Length];
-            S.Receive(ReceiveBuffer, Length, SocketFlags.None);
-
-            return ReceiveBuffer;
-        }
+       
 
         private static void SendData(byte[] Data, Socket S)
         {
-            int MessageLength = Data.Length;
-            byte[] LengthBytes = BitConverter.GetBytes(MessageLength);
-            S.Send(LengthBytes, LengthBytes.Length, SocketFlags.None);
+            byte[] NL = Encoding.UTF8.GetBytes(Environment.NewLine);
             S.Send(Data, Data.Length, SocketFlags.None);
+            S.Send(NL, NL.Length, SocketFlags.None);
         }
 
         private static void Begin()
@@ -55,27 +48,29 @@ namespace Server
             ServerSocket.Bind(new IPEndPoint(IPAddress.Loopback, 45342));
             ServerSocket.Listen(0);
 
+            Console.Out.WriteLine("READY");
+
             new System.Threading.Thread(() =>
             {
                 while (true)
                 {
                     NRClientSocket = ServerSocket.Accept();
+                    NRClientSocket.NoDelay = true;
 
-                    int PortStringLength = BitConverter.ToInt32(ReadData(4, NRClientSocket),0);
-                    byte[] PortStringBytes = ReadData(PortStringLength, NRClientSocket);
+                    NetworkStream NWS = new NetworkStream(NRClientSocket);
+                    StreamReader SR = new StreamReader(NWS);
 
-                    SerialPort = System.Text.Encoding.UTF8.GetString(PortStringBytes);
+
+                    SerialPort = SR.ReadLine();
 
                     Init();
 
                     while(true)
                     {
-                        int MessageStringLength = BitConverter.ToInt32(ReadData(4, NRClientSocket), 0);
-                        byte[] MessageBytes = ReadData(MessageStringLength, NRClientSocket);
-
-                        if(Inited)
+                        string MSG = SR.ReadLine();
+                        if (Inited)
                         {
-                            Process(System.Text.Encoding.UTF8.GetString(MessageBytes));
+                            Process(MSG);
                         }
 
                     }
@@ -108,8 +103,6 @@ namespace Server
 
                 ZWaveLib.CommandClasses.ThermostatMode.Value TSMV;
                 ZWaveLib.CommandClasses.ThermostatSetPoint.Value TSPV;
-                ZWaveLib.ZWaveMessage Message;
-                byte[] Result;
 
 
 
@@ -159,15 +152,13 @@ namespace Server
 
                     // Raw
                     case "RawZWaveMessage":
-                        Result = ZWaveLib.ZWaveMessage.BuildSendDataRequest(_Request.node, _Request.raw);
-                        Message = new ZWaveLib.ZWaveMessage(Result);
-                        ZWC.QueueMessage(Message);
-
+                        ZWC.GetNode(_Request.node).SendDataRequest(_Request.raw);
                         break;
 
                     // MultiLevel
                     case "SetMultiLevelSwitch":
                         ZWaveLib.CommandClasses.SwitchMultilevel.Set(ZWC.GetNode(_Request.node), Convert.ToInt32(_Request.operation_vars[0]));
+                        
                         break;
 
                     case "GetMultiLevelSwitch":
@@ -250,10 +241,7 @@ namespace Server
                         MessageBytes[6] = Convert.ToByte(_Request.operation_vars[0]);
                         MessageBytes[7] = Convert.ToByte(_Request.operation_vars[1]);
 
-                        Result = ZWaveLib.ZWaveMessage.BuildSendDataRequest(_Request.node, MessageBytes);
-                        Message = new ZWaveLib.ZWaveMessage(Result);
-                        ZWC.QueueMessage(Message);
-
+                        ZWC.GetNode(_Request.node).SendDataRequest(MessageBytes);
 
                         break;
 
@@ -301,7 +289,7 @@ namespace Server
             Status.Add("value", "System Initializing...");
             Status.Add("color", "yellow");
             Send(Status);
-
+            
             ZWC = new ZWaveLib.ZWaveController(SerialPort);
 
             SPI =  (SerialPortLib.SerialPortInput)ZWC.GetType().GetField("serialPort", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(ZWC);
@@ -317,7 +305,7 @@ namespace Server
 
 
 
-            Status["value"] = "Connecting to Controller...";
+            Status["value"] = "Connecting to Controller ("+SerialPort+")...";
             Send(Status);
 
 

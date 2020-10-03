@@ -182,7 +182,7 @@ There is only 1 configuration value that you need to amend, and that is the seri
 
     Added **HealNetwork**, **SoftReset** and **HardReset** methods  
 	Cleaned up executable code.  
-	Moved the Inter Process communication to the TCP based protocol.
+	Moved IPC between .Net and NodeJS to the TCP protocol.
 
   - 1.1.3  
     Cleared up Node Status Logic  
