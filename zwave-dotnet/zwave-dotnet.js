@@ -1,34 +1,21 @@
 module.exports = function (RED)
 {
     const SP = require("serialport");
+    const net = require('net');
+    const spawn = require('child_process').spawn;
+    const os = require('os')
+    const nl = require('readline')
+    
     function Init(config)
     {
         const node = this;
         RED.nodes.createNode(this, config);
-        node.status({ fill: "yellow", shape: "dot", text: "Initializing server..." });
 
-        const spawn = require('child_process').spawn;
-
-        const os = require('os')
-        const RL = require('readline')
-
+        let Socket;
+        let LR;
         let ServerProcess;
-        let LineReader;
 
-        node.on('close', function (done)
-        {
-          
-            ServerProcess.kill('SIGTERM');
-
-            done();
-        });
-
-        node.on('input', function (msg)
-        {
-            const Payload = JSON.stringify(msg.payload);
-            ServerProcess.stdin.write(Payload + '\r\n');
-
-        });
+        node.status({ fill: "yellow", shape: "dot", text: "Starting server process..." });
 
         const ENV = process.env;
         const EXEPath = __dirname + '/Server.exe';
@@ -37,44 +24,54 @@ module.exports = function (RED)
         {
             ServerProcess = spawn(EXEPath, [], { env: ENV, })
         }
-        else 
+        else
         {
             ServerProcess = spawn("mono", [EXEPath], { env: ENV, })
         }
-       
 
-        ServerProcess.stdout.setEncoding('utf8');
-
-        LineReader = RL.createInterface({ input: ServerProcess.stdout });
-
-        LineReader.on('line', function (line)
+        ServerProcess.stdout.on('data', (D) =>
         {
-            if (line == "READY")
+            node.status({ fill: "yellow", shape: "dot", text: "Connecting to server..." });
+            Socket = net.createConnection(45342, '127.0.0.1', () =>
             {
-                ServerProcess.stdin.write('INIT\r\n');
-                ServerProcess.stdin.write(config.serialPort + '\r\n');
-            }
-            else
-            {
-                ProcessMessage(line);
-            }
-            
+                Socket.setNoDelay(true);
+                LR = nl.createInterface(Socket);
+                LR.on('line', ProcessMessage);
+                Write(config.serialPort);
+
+            });
+
+        })
+
+        function Write(Data)
+        {
+            Socket.write(Data);
+            Socket.write("\n")
+        }
+
+        node.on('close', function (done)
+        {
+            Socket.destroy();
+            ServerProcess.kill('SIGKILL');
+
+            done();
         });
-        
-       
+
+        node.on('input', function (msg)
+        {
+            const Payload = JSON.stringify(msg.payload);
+            Write(Payload);
+            
+
+        });
 
         function ProcessMessage(Payload)
         {
             const OBJ = JSON.parse(Payload);
 
-          
-
             if (OBJ.type == "SystemStatus")
             {
                 node.status({ fill: OBJ.color, shape: "dot", text: OBJ.value });
-               
-                
-                
             }
             else
             {

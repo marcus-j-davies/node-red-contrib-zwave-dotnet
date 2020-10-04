@@ -18,51 +18,68 @@ namespace Server
         static bool Inited = false;
         static string SerialPort = string.Empty;
         static SerialPortLib.SerialPortInput SPI = null;
+        static Socket ServerSocket = null;
+        static Socket NRClientSocket = null;
+
+        static void Main(string[] args)
+        {
+            Begin();
+        }
 
         private static void Send(Dictionary<string, object> Payload)
         {
             string JSON = Newtonsoft.Json.JsonConvert.SerializeObject(Payload);
-            Console.Out.WriteLine(JSON);
+            byte[] Data = System.Text.Encoding.UTF8.GetBytes(JSON);
+            SendData(Data, NRClientSocket);
         }
        
-        static void Main(string[] args)
-        {
-            
+       
 
-            Begin();
+        private static void SendData(byte[] Data, Socket S)
+        {
+            byte[] NL = Encoding.UTF8.GetBytes(Environment.NewLine);
+            S.Send(Data, Data.Length, SocketFlags.None);
+            S.Send(NL, NL.Length, SocketFlags.None);
         }
 
         private static void Begin()
         {
+            ServerSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            ServerSocket.Bind(new IPEndPoint(IPAddress.Loopback, 45342));
+            ServerSocket.Listen(0);
+
+            Console.Out.WriteLine("READY");
+
             new System.Threading.Thread(() =>
             {
                 while (true)
                 {
-                    string Payload = Console.In.ReadLine();
+                    NRClientSocket = ServerSocket.Accept();
+                    NRClientSocket.NoDelay = true;
 
-                    switch (Payload)
+                    NetworkStream NWS = new NetworkStream(NRClientSocket);
+                    StreamReader SR = new StreamReader(NWS);
+
+
+                    SerialPort = SR.ReadLine();
+
+                    Init();
+
+                    while(true)
                     {
-                        case "INIT":
-                            SerialPort = Console.In.ReadLine();
-                            Init();
-                            break;
+                        string MSG = SR.ReadLine();
+                        if (Inited)
+                        {
+                            Process(MSG);
+                        }
 
-                        default:
-                            if(Inited)
-                            {
-                                Process(Payload);
-                            }
-                            
-                            break;
                     }
+
+
+                   
                 }
 
             }).Start();
-
-
-
-
-            Console.Out.WriteLine("READY");
 
             System.Threading.Thread.Sleep(-1);
 
@@ -79,13 +96,44 @@ namespace Server
                 Request _Request = Newtonsoft.Json.JsonConvert.DeserializeObject<Request>(Payload);
                 Dictionary<string, object> Status = new Dictionary<string, object>();
                 Status.Add("type", "SystemStatus");
-                Status.Add("value", "Sending : " + _Request.operation + " [NodeID:" + _Request.node  + "] (" + DateTime.Now.ToString() + ")");
-                Status.Add("color", "yellow");
+                Status.Add("value", "Last Sent : " + _Request.operation + " [NodeID:" + _Request.node + "] (" + DateTime.Now.ToString() + ")");
+                Status.Add("color", "green");
                 Send(Status);
+
+
+                ZWaveLib.CommandClasses.ThermostatMode.Value TSMV;
+                ZWaveLib.CommandClasses.ThermostatSetPoint.Value TSPV;
+
 
 
                 switch (_Request.operation)
                 {
+                    // List
+                    case "GetNodes":
+                        Status.Clear();
+                        Status.Add("type", "NodeMessage");
+                        Status.Add("node", 1);
+                        Status.Add("class", "GetNodes");
+                        Status.Add("index", 0);
+                        Status.Add("value", ZWC.Nodes);
+                        Status.Add("timestamp", DateTime.Now);
+                        Send(Status);
+                        break;
+
+                    // Soft Reset
+                    case "SoftReset":
+                        ZWC.SoftReset();
+                        break;
+
+                    // Hard Reset
+                    case "HardReset":
+                        ZWC.HardReset();
+                        break;
+
+                    // heal
+                    case "HealNetwork":
+                        ZWC.HealNetwork();
+                        break;
 
                     //add
                     case "StartNodeAdd":
@@ -109,19 +157,20 @@ namespace Server
 
 
                     // By Pass
-                    case "DirectSerial":
-                        SendSerial(_Request.raw);
+                    case "SerialAPIMessage":
+                        SPI.SendMessage(_Request.raw);
                         break;
 
 
                     // Raw
-                    case "RawData":
-                        SendRaw(_Request.node, _Request.raw);
+                    case "RawZWaveMessage":
+                        ZWC.GetNode(_Request.node).SendDataRequest(_Request.raw);
                         break;
 
                     // MultiLevel
                     case "SetMultiLevelSwitch":
-                        SetMultiSwitch(_Request.node, Convert.ToInt32(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.SwitchMultilevel.Set(ZWC.GetNode(_Request.node), Convert.ToInt32(_Request.operation_vars[0]));
+                        
                         break;
 
                     case "GetMultiLevelSwitch":
@@ -130,7 +179,10 @@ namespace Server
 
                     // Thermostate Mode
                     case "SetThermostatMode":
-                        SetThermostatMode(_Request.node, Convert.ToString(_Request.operation_vars[0]));
+                        TSMV = (ZWaveLib.CommandClasses.ThermostatMode.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatMode.Value), Convert.ToString(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.ThermostatMode.Set(ZWC.GetNode(_Request.node), TSMV);
+
+
                         break;
 
                     case "GetThermostatMode":
@@ -139,18 +191,21 @@ namespace Server
 
                     // Thermostate Setpoint
                     case "SetThermostatSetPoint":
-                        SetThermostatSetPoint(_Request.node, Convert.ToString(_Request.operation_vars[0]), Convert.ToDouble(_Request.operation_vars[1]));
+                        TSPV  = (ZWaveLib.CommandClasses.ThermostatSetPoint.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatSetPoint.Value), Convert.ToString(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.ThermostatSetPoint.Set(ZWC.GetNode(_Request.node), TSPV, Convert.ToDouble(_Request.operation_vars[1]));
+
+
                         break;
 
                     case "GetThermostatSetPoint":
-                        ZWaveLib.CommandClasses.ThermostatSetPoint.Value Value = (ZWaveLib.CommandClasses.ThermostatSetPoint.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatSetPoint.Value), Convert.ToString(_Request.operation_vars[0]));
-                        ZWaveLib.CommandClasses.ThermostatSetPoint.Get(ZWC.GetNode(_Request.node), Value);
+                        TSPV = (ZWaveLib.CommandClasses.ThermostatSetPoint.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatSetPoint.Value), Convert.ToString(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.ThermostatSetPoint.Get(ZWC.GetNode(_Request.node), TSPV);
                         break;
 
 
                     // Wake up
                     case "SetWakeInterval":
-                        SetWakeInterval(_Request.node, Convert.ToUInt32(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.WakeUp.Set(ZWC.GetNode(_Request.node), Convert.ToUInt32(_Request.operation_vars[0]));
                         break;
 
                     case "GetWakeInterval":
@@ -159,7 +214,7 @@ namespace Server
 
                     // Config
                     case "SetConfiguration":
-                        SetConfiguration(_Request.node, Convert.ToByte(_Request.operation_vars[0]), Convert.ToInt32(_Request.operation_vars[1]));
+                        ZWaveLib.CommandClasses.Configuration.Set(ZWC.GetNode(_Request.node), Convert.ToByte(_Request.operation_vars[0]), Convert.ToInt32(_Request.operation_vars[1]));
                         break;
 
                     case "GetConfiguration":
@@ -168,7 +223,7 @@ namespace Server
 
                     // Binary
                     case "SetBinary":
-                        SetBinary(_Request.node, Convert.ToBoolean(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.SwitchBinary.Set(ZWC.GetNode(_Request.node), Convert.ToInt32(Convert.ToBoolean(_Request.operation_vars[0])));
                         break;
 
                     case "GetBinary":
@@ -177,7 +232,7 @@ namespace Server
 
                     // Basic
                     case "SetBasic":
-                        SetBasic(_Request.node, Convert.ToInt32(_Request.operation_vars[0]));
+                        ZWaveLib.CommandClasses.Basic.Set(ZWC.GetNode(_Request.node), Convert.ToInt32(_Request.operation_vars[0]));
                         break;
 
                     case "GetBasic":
@@ -192,7 +247,14 @@ namespace Server
 
                     // Notification
                     case "SendNotificationReport":
-                        SendNotificationReport(_Request.node, Convert.ToByte(_Request.operation_vars[0]), Convert.ToByte(_Request.operation_vars[1]));
+                        byte[] MessageBytes = new byte[10];
+                        MessageBytes[0] = 0x71;
+                        MessageBytes[1] = 0x05;
+                        MessageBytes[6] = Convert.ToByte(_Request.operation_vars[0]);
+                        MessageBytes[7] = Convert.ToByte(_Request.operation_vars[1]);
+
+                        ZWC.GetNode(_Request.node).SendDataRequest(MessageBytes);
+
                         break;
 
                     default:
@@ -207,11 +269,8 @@ namespace Server
 
              
 
-                Status.Clear();
-                Status.Add("type", "SystemStatus");
-                Status.Add("value", "Sent : " + _Request.operation + " [NodeID:" + _Request.node + "] (" + DateTime.Now.ToString() + ")");
-                Status.Add("color", "green");
-                Send(Status);
+               
+                
 
             Exit:
                 return;
@@ -239,7 +298,7 @@ namespace Server
             Status.Add("value", "System Initializing...");
             Status.Add("color", "yellow");
             Send(Status);
-
+            
             ZWC = new ZWaveLib.ZWaveController(SerialPort);
 
             SPI =  (SerialPortLib.SerialPortInput)ZWC.GetType().GetField("serialPort", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(ZWC);
@@ -248,6 +307,7 @@ namespace Server
             ZWC.NodeUpdated += ZWC_NodeUpdated;
             ZWC.NodeOperationProgress += ZWC_NodeOperationProgress;
             ZWC.DiscoveryProgress += ZWC_DiscoveryProgress;
+            ZWC.HealProgress += ZWC_HealProgress;
             
 
          
@@ -255,11 +315,34 @@ namespace Server
 
 
 
-            Status["value"] = "Connecting to Controller...";
+            Status["value"] = "Connecting to Controller ("+SerialPort+")...";
             Send(Status);
 
 
             ZWC.Connect();
+        }
+
+        private static void ZWC_HealProgress(object sender, ZWaveLib.HealProgressEventArgs args)
+        {
+            Dictionary<string, object> Status = new Dictionary<string, object>();
+
+            if (args.Status == ZWaveLib.HealStatus.HealStart)
+            {
+                Status.Add("type", "SystemStatus");
+                Status.Add("value", "Network Heal Started...");
+                Status.Add("color", "yellow");
+                Send(Status);
+                Inited = false;
+            }
+
+            if (args.Status == ZWaveLib.HealStatus.HealEnd)
+            {
+                Status.Add("type", "SystemStatus");
+                Status.Add("value", "ZWave Controller Ready");
+                Status.Add("color", "green");
+                Send(Status);
+                Inited = true;
+            }
         }
 
         private static void ZWC_DiscoveryProgress(object sender, ZWaveLib.DiscoveryProgressEventArgs args)
@@ -278,83 +361,48 @@ namespace Server
 
         private static void ZWC_NodeOperationProgress(object sender, ZWaveLib.NodeOperationProgressEventArgs args)
         {
-            Dictionary<string, object> Payload = new Dictionary<string, object>();
+            Dictionary<string, object> Status = new Dictionary<string, object>();
 
-            
+            if(args.Status == ZWaveLib.NodeQueryStatus.NodeAddReady)
+            {
+                Status.Add("type", "SystemStatus");
+                Status.Add("value", "Please put target device into Inclusion mode.");
+                Status.Add("color", "yellow");
+                Send(Status);
+            }
 
-            Payload.Add("type", "NodeMessage");
-            Payload.Add("node", args.NodeId);
-            Payload.Add("class", "NodeOperation");
-            Payload.Add("index", 0);
-            Payload.Add("value", args.Status.ToString());
-            Payload.Add("timestamp", args.Timestamp);
+            if (args.Status == ZWaveLib.NodeQueryStatus.NodeRemoveReady)
+            {
+                Status.Add("type", "SystemStatus");
+                Status.Add("value", "Please put target device into Exclusion mode.");
+                Status.Add("color", "yellow");
+                Send(Status);
+            }
 
-            Send(Payload);
+            if (args.Status == ZWaveLib.NodeQueryStatus.NodeAddDone || args.Status == ZWaveLib.NodeQueryStatus.NodeRemoveDone)
+            {
+                Status.Add("type", "SystemStatus");
+                Status.Add("value", "ZWave Controller Ready");
+                Status.Add("color", "green");
+                Send(Status);
+            }
 
-          
-        }
+            if(args.Status == ZWaveLib.NodeQueryStatus.NodeAdded)
+            {
+                Status.Add("type", "NodeMessage");
+                Status.Add("node", args.NodeId);
+                Status.Add("class", "NodeAdded");
+                Status.Add("index", 0);
+                Status.Add("value", args.NodeId);
+                Status.Add("timestamp", args.Timestamp);
 
-        private static void SendRaw(byte NodeID, byte[] RawData)
-        {
-            byte[] Result = ZWaveLib.ZWaveMessage.BuildSendDataRequest(NodeID, RawData);
-            ZWaveLib.ZWaveMessage Message = new ZWaveLib.ZWaveMessage(Result);
-            ZWC.QueueMessage(Message);
-        }
-
-        private static void SetMultiSwitch(byte NodeID, int Value)
-        {
-            ZWaveLib.CommandClasses.SwitchMultilevel.Set(ZWC.GetNode(NodeID), Value);
-        }
-
-        private static void SetThermostatMode(byte NodeID, string Mode)
-        {
-            ZWaveLib.CommandClasses.ThermostatMode.Value Value = (ZWaveLib.CommandClasses.ThermostatMode.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatMode.Value), Mode);
-            ZWaveLib.CommandClasses.ThermostatMode.Set(ZWC.GetNode(NodeID), Value);
-        }
-
-        private static void SetThermostatSetPoint(byte NodeID, string Setpoint,double DValue)
-        {
-            ZWaveLib.CommandClasses.ThermostatSetPoint.Value Value = (ZWaveLib.CommandClasses.ThermostatSetPoint.Value)Enum.Parse(typeof(ZWaveLib.CommandClasses.ThermostatSetPoint.Value), Setpoint);
-            ZWaveLib.CommandClasses.ThermostatSetPoint.Set(ZWC.GetNode(NodeID),Value, DValue);
-        }
+                Send(Status);
+            }
 
 
-        private static void SetWakeInterval(byte NodeID, uint Seconds)
-        {
-            ZWaveLib.CommandClasses.WakeUp.Set(ZWC.GetNode(NodeID), Seconds);
-        }
 
-        private static void SetConfiguration(byte NodeID, byte Parameter, int Value)
-        {
-            ZWaveLib.CommandClasses.Configuration.Set(ZWC.GetNode(NodeID), Parameter, Value);
-        }
 
-        private static void SetBinary(byte NodeID, bool Value)
-        {
-            ZWaveLib.CommandClasses.SwitchBinary.Set(ZWC.GetNode(NodeID), Convert.ToInt32(Value));
-        }
 
-        private static void SetBasic(byte NodeID, int Value)
-        {
-            ZWaveLib.CommandClasses.Basic.Set(ZWC.GetNode(NodeID), Value);
-        }
-
-        private static void SendNotificationReport(byte NodeID, byte Type, byte Event)
-        {
-            byte[] MessageBytes = new byte[10];
-            MessageBytes[0] = 0x71;
-            MessageBytes[1] = 0x05;
-            MessageBytes[6] = Type;
-            MessageBytes[7] = Event;
-
-            byte[] Result = ZWaveLib.ZWaveMessage.BuildSendDataRequest(NodeID, MessageBytes);
-            ZWaveLib.ZWaveMessage Message = new ZWaveLib.ZWaveMessage(Result);
-            ZWC.QueueMessage(Message);
-        } 
-
-        private static void SendSerial(byte[] Raw)
-        {
-            SPI.SendMessage(Raw);
         }
 
         private static void ZWC_NodeUpdated(object sender, ZWaveLib.NodeUpdatedEventArgs args)

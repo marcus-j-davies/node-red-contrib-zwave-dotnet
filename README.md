@@ -4,8 +4,8 @@ An extremely easy to use, feature rich, ZWave node for node-red.
 This node gives you the ability to interact with your ZWave devices right from node-red.
 At the heart of this node, is a .Net Executable that manages all the required transport components for ZWave, the executable is based on the awesome zwave-lib-dotnet source code (https://github.com/genielabs/zwave-lib-dotnet)
 
-The node is extremely easy to use, and only has 1 dependency - .Net/Mono. If running on a non windows platform,  
-I recommend installing mono-complete, to ensure a fully functional framework is available.  
+The node is extremely easy to use, and only has 1 requirement - .Net/Mono.  
+If running on a non windows platform, I recommend installing **mono-complete** from your package manager, to ensure a fully functional framework is available.  
 
 The node will recieve all events that are taking place in your ZWave network, and in turn will allow you to respond accordingly.
 
@@ -81,20 +81,24 @@ Example of building a notifcation report.
 ```
 {
   "node":7,
-  "operation":"RawData",
+  "operation":"RawZWaveMessage",
   "raw":[0x71,0x5,0x0,0x0,0x0,0x0,0xA,0x2,0x0,0x0],
 }
 ```
 
 ## Operation List
-The 4 commands below do not require a node object, as the command is addressed to the controller its self.  
+The 8 commands below do not require a node object, as the command is addressed to the controller its self.  
 **StartNodeAdd**  
 **StartNodeRemove**  
 **StopNodeAdd**  
 **StopNodeRemove**  
+**HealNetwork**  
+**SoffReset**  
+**HardReset**  
+**GetNodes**
   
 Basic controlling of zwave nodes  
-**RawData** : raw [Byte Array]  
+**RawZWaveMessage** : raw [Byte Array]  
 **SetMultiLevelSwitch** : operation_vars [Integer]  
 **GetMultiLevelSwitch**  
 **SetThermostatMode** : operation_vars [String] - (see Thermostat Modes)  
@@ -113,23 +117,23 @@ Basic controlling of zwave nodes
 **SendNotificationReport** : operation_vars [Byte, Byte] - (Type,Event)  
 
 Expert / Advanced Operations  
-**DirectSerial** : See Below  
+**SerialAPIMessage** : See Below  
 
-## Direct Serial (CAUTION!!)
-WARNING! Using Direct Serial commands, bypasses all sanitisation offered by the Server/zwave lib - in essence, what you send, will be sent directly to your USB zwave controller. Sending an incorrect value, could, in theory harm/damage your controller and other related equipment if not used correctly. - **I am not responsable for any damage/harm caused to any piece of equipment/software as a result of using DirectSerial** 
+## Serial API Message (CAUTION!!)  
+WARNING! Using Serial API commands, bypasses all sanitisation offered by the Server/zwave lib - in essence, what you send, will be sent directly to your USB zwave controller. Sending an incorrect value, could, in theory harm/damage your controller and other related equipment if not used correctly. - **I am not responsable for any damage/harm caused to any piece of equipment/software as a result of using DirectSerial** 
 
-Why would you use DirectSerial?
-DirectSerial allows you to directly send data to the USB controller. such as configuring its Power Level and other configuration values related to the controller, that is othrwise not supported by the zwave lib. It requires that you know how to contstruct the paylaod that it expects.
+Why would you use SerialAPIMessage?  
+SerialAPIMessage allows you to directly send data to the USB controller. such as configuring its Power Level and other configuration values related to the controller, that is othrwise not supported by the zwave lib. It requires that you know how to contstruct the paylaod that it expects.
 
 Example?  
-Disabling the LED on the Aeotec Gen5 Z Stick (you do not need to specify a node - remember, if a node id is required in any command, you have to ensure its correctly included/formatted in the raw data object.
+Disabling the LED on the Aeotec Gen5 Z Stick (you do not need to specify a node - remember, if using SerialAPIMessage and the command you are sending happens to require a Node ID, you have to ensure its correctly included/formatted in the raw data object.
 ```
 {
-  "operation":"DirectSerial",
+  "operation":"SerialAPIMessage",
   "raw":[0x01,0x08,0x00,0xF2,0x51,0x01,0x00,0x05,0x01,0x51]
 }
 ```
-The difference between **RawData** and **DirectSerial** is that RawData requires a valid zwave packet, and the node that it should be addressed to. DirectSerial on the other hand, is asking you to construct a serial api request. see (https://www.silabs.com/documents/login/user-guides/INS12350-Serial-API-Host-Appl.-Prg.-Guide.pdf)
+The difference between **RawZWaveMessage** and **SerialAPIMessage** is that RawZWaveMessage requires a valid zwave packet, and the node that it should be addressed to. SerialAPIMessage on the other hand, is asking you to construct a serial api request. see (https://www.silabs.com/documents/login/user-guides/INS12350-Serial-API-Host-Appl.-Prg.-Guide.pdf)
 
 ## Thermostat Modes
 Off  
@@ -170,7 +174,17 @@ npm install ./node-red-contrib-zwave-dotnet
 ## Configuration
 There is only 1 configuration value that you need to amend, and that is the serial port address. Double click the node when its in your flow to modify it.
 
-## Version History
+## Version History  
+  - 1.2.0  
+    **BREAKING CHANGES**  
+
+	If you use the **RawData** method - This has been renamed to **RawZWaveMessage**  
+	If you use the **DirectSerial** method - This has been renamed to **SerialAPIMessage**  
+
+    Added **HealNetwork**, **SoftReset**, **HardReset** and **GetNodes** methods  
+	Cleaned up executable code.  
+	Moved IPC between .Net and NodeJS to the TCP protocol.
+
   - 1.1.3  
     Cleared up Node Status Logic  
 	Updated node help
