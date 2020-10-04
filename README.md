@@ -4,8 +4,8 @@ An extremely easy to use, feature rich, ZWave node for node-red.
 This node gives you the ability to interact with your ZWave devices right from node-red.
 At the heart of this node, is a .Net Executable that manages all the required transport components for ZWave, the executable is based on the awesome zwave-lib-dotnet source code (https://github.com/genielabs/zwave-lib-dotnet)
 
-The node is extremely easy to use, and only has 1 dependency - .Net/Mono. If running on a non windows platform,  
-I recommend installing mono-complete, to ensure a fully functional framework is available.  
+The node is extremely easy to use, and only has 1 requirement - .Net/Mono.  
+If running on a non windows platform, I recommend installing **mono-complete** from your package manager, to ensure a fully functional framework is available.  
 
 The node will recieve all events that are taking place in your ZWave network, and in turn will allow you to respond accordingly.
 
@@ -87,7 +87,7 @@ Example of building a notifcation report.
 ```
 
 ## Operation List
-The 7 commands below do not require a node object, as the command is addressed to the controller its self.  
+The 8 commands below do not require a node object, as the command is addressed to the controller its self.  
 **StartNodeAdd**  
 **StartNodeRemove**  
 **StopNodeAdd**  
@@ -95,6 +95,7 @@ The 7 commands below do not require a node object, as the command is addressed t
 **HealNetwork**  
 **SoffReset**  
 **HardReset**  
+**GetNodes**
   
 Basic controlling of zwave nodes  
 **RawZWaveMessage** : raw [Byte Array]  
@@ -180,7 +181,7 @@ There is only 1 configuration value that you need to amend, and that is the seri
 	If you use the **RawData** method - This has been renamed to **RawZWaveMessage**  
 	If you use the **DirectSerial** method - This has been renamed to **SerialAPIMessage**  
 
-    Added **HealNetwork**, **SoftReset** and **HardReset** methods  
+    Added **HealNetwork**, **SoftReset**, **HardReset** and **GetNodes** methods  
 	Cleaned up executable code.  
 	Moved IPC between .Net and NodeJS to the TCP protocol.
 

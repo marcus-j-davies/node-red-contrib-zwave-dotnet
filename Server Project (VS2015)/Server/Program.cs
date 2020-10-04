@@ -96,8 +96,8 @@ namespace Server
                 Request _Request = Newtonsoft.Json.JsonConvert.DeserializeObject<Request>(Payload);
                 Dictionary<string, object> Status = new Dictionary<string, object>();
                 Status.Add("type", "SystemStatus");
-                Status.Add("value", "Sending : " + _Request.operation + " [NodeID:" + _Request.node  + "] (" + DateTime.Now.ToString() + ")");
-                Status.Add("color", "yellow");
+                Status.Add("value", "Last Sent : " + _Request.operation + " [NodeID:" + _Request.node + "] (" + DateTime.Now.ToString() + ")");
+                Status.Add("color", "green");
                 Send(Status);
 
 
@@ -108,6 +108,18 @@ namespace Server
 
                 switch (_Request.operation)
                 {
+                    // List
+                    case "GetNodes":
+                        Status.Clear();
+                        Status.Add("type", "NodeMessage");
+                        Status.Add("node", 1);
+                        Status.Add("class", "GetNodes");
+                        Status.Add("index", 0);
+                        Status.Add("value", ZWC.Nodes);
+                        Status.Add("timestamp", DateTime.Now);
+                        Send(Status);
+                        break;
+
                     // Soft Reset
                     case "SoftReset":
                         ZWC.SoftReset();
@@ -257,11 +269,8 @@ namespace Server
 
              
 
-                Status.Clear();
-                Status.Add("type", "SystemStatus");
-                Status.Add("value", "Sent : " + _Request.operation + " [NodeID:" + _Request.node + "] (" + DateTime.Now.ToString() + ")");
-                Status.Add("color", "green");
-                Send(Status);
+               
+                
 
             Exit:
                 return;
@@ -298,6 +307,7 @@ namespace Server
             ZWC.NodeUpdated += ZWC_NodeUpdated;
             ZWC.NodeOperationProgress += ZWC_NodeOperationProgress;
             ZWC.DiscoveryProgress += ZWC_DiscoveryProgress;
+            ZWC.HealProgress += ZWC_HealProgress;
             
 
          
@@ -310,6 +320,29 @@ namespace Server
 
 
             ZWC.Connect();
+        }
+
+        private static void ZWC_HealProgress(object sender, ZWaveLib.HealProgressEventArgs args)
+        {
+            Dictionary<string, object> Status = new Dictionary<string, object>();
+
+            if (args.Status == ZWaveLib.HealStatus.HealStart)
+            {
+                Status.Add("type", "SystemStatus");
+                Status.Add("value", "Network Heal Started...");
+                Status.Add("color", "yellow");
+                Send(Status);
+                Inited = false;
+            }
+
+            if (args.Status == ZWaveLib.HealStatus.HealEnd)
+            {
+                Status.Add("type", "SystemStatus");
+                Status.Add("value", "ZWave Controller Ready");
+                Status.Add("color", "green");
+                Send(Status);
+                Inited = true;
+            }
         }
 
         private static void ZWC_DiscoveryProgress(object sender, ZWaveLib.DiscoveryProgressEventArgs args)
@@ -328,20 +361,48 @@ namespace Server
 
         private static void ZWC_NodeOperationProgress(object sender, ZWaveLib.NodeOperationProgressEventArgs args)
         {
-            Dictionary<string, object> Payload = new Dictionary<string, object>();
+            Dictionary<string, object> Status = new Dictionary<string, object>();
 
-            
+            if(args.Status == ZWaveLib.NodeQueryStatus.NodeAddReady)
+            {
+                Status.Add("type", "SystemStatus");
+                Status.Add("value", "Please put target device into Inclusion mode.");
+                Status.Add("color", "yellow");
+                Send(Status);
+            }
 
-            Payload.Add("type", "NodeMessage");
-            Payload.Add("node", args.NodeId);
-            Payload.Add("class", "NodeOperation");
-            Payload.Add("index", 0);
-            Payload.Add("value", args.Status.ToString());
-            Payload.Add("timestamp", args.Timestamp);
+            if (args.Status == ZWaveLib.NodeQueryStatus.NodeRemoveReady)
+            {
+                Status.Add("type", "SystemStatus");
+                Status.Add("value", "Please put target device into Exclusion mode.");
+                Status.Add("color", "yellow");
+                Send(Status);
+            }
 
-            Send(Payload);
+            if (args.Status == ZWaveLib.NodeQueryStatus.NodeAddDone || args.Status == ZWaveLib.NodeQueryStatus.NodeRemoveDone)
+            {
+                Status.Add("type", "SystemStatus");
+                Status.Add("value", "ZWave Controller Ready");
+                Status.Add("color", "green");
+                Send(Status);
+            }
 
-          
+            if(args.Status == ZWaveLib.NodeQueryStatus.NodeAdded)
+            {
+                Status.Add("type", "NodeMessage");
+                Status.Add("node", args.NodeId);
+                Status.Add("class", "NodeAdded");
+                Status.Add("index", 0);
+                Status.Add("value", args.NodeId);
+                Status.Add("timestamp", args.Timestamp);
+
+                Send(Status);
+            }
+
+
+
+
+
         }
 
         private static void ZWC_NodeUpdated(object sender, ZWaveLib.NodeUpdatedEventArgs args)
