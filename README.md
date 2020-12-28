@@ -1,6 +1,9 @@
 # node-red-contrib-zwave-dotnet
 An extremely easy to use, feature rich, ZWave node for node-red.
 
+## ! -- NO LONGER MAINTAINED -- !
+Please see [node-red-contrib-zwave-js](https://github.com/marcus-j-davies/node-red-contrib-zwave-js)  
+
 This node gives you the ability to interact with your ZWave devices right from node-red.
 At the heart of this node, is a .Net Executable that manages all the required transport components for ZWave, the executable is based on the awesome zwave-lib-dotnet source code (https://github.com/genielabs/zwave-lib-dotnet)
 
